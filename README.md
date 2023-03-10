@@ -34,10 +34,10 @@ def index():
 ```
 
 ## Run the project 
-- run the main.py and follow the link
+- Run the main.py and follow the link
 - Page 1: Select from this page which parts you need to be changed in the new ini file from the old one
-- page 2: Make some restrictions on the data type of the chosen items 
-- page 3: Choose new Friendly names to be shown for the Engineer user 
+- Page 2: Make some restrictions on the data type of the chosen items 
+- Page 3: Choose new Friendly names to be shown for the Engineer user 
 - Page 4: If this page is shown, it means your deployment is done successfully and your data saved in a json file 
 
 ## Contributing
