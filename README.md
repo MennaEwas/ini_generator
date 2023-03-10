@@ -41,7 +41,7 @@ def index():
 - Page 4: If this page is shown, it means your deployment is done successfully and your data saved in a json file 
 
 ## Contributing
-@MennaEwas
+[MennaEwas](https://github.com/MennaEwas/)
 
 ## License
 
