@@ -1,0 +1,64 @@
+@app.route("/", methods = ['GET', 'POST'])
+def index():
+    config = configparser.ConfigParser()
+    config.read('file.ini')
+    options = {}
+    for section in config.sections():
+        options[section] = dict(config.items(section))
+    
+    if request.method == 'POST':
+        if request.form.get('action') == 'value':
+            pass #save the choices in txt file 
+    return render_template('index.html', options=options)
+
+Built the GUI using Pyqt and Qt designer and Virtualizer using Openneubla, ISCSI, and Paramiko on SSH. the goal is to
+turn bare-metal datacenter into a working cloud.
+
+Built a Multilayer perceptron to create a model to recognize Arabic text and extract the text from images. Reached 99%
+accuracy in our mode after many trials in testing and debugging.
+
+Built a model using Reinforcement Learning and Q-learning. A connect4 model competes with models like megamix,
+random, and Kaggle agents. The Model played connect4 with 0 loss.
+
+\[\w+\] | \[\w+,.*\]
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Input Form</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+<body class="body">
+	<div class="container my-5 bg-danger ">
+	<form method="POST">
+		<div class=" w-100 h=100 d-flex align-items-center text-align-center">
+		<table class="text-white">
+			<thead>
+			  <tr>
+				<th>Name</th>
+				<th>Friendly Name</th>
+			  </tr>
+			</thead>
+			<tbody >
+			  {% for name in value_dict %}
+				<tr>
+				  <td class="fst-italic"> {{ name }} :</td>
+				  <td><input class="form-control" type="text" name={{name}}></td>
+
+				</tr>
+			  {% endfor %}
+			</tbody>
+			
+		  </table>
+		</div>
+		  <input class="form-control btn btn-success w-25  my-2" type="submit" value="Submit" name="action">
+	</form>
+</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>
