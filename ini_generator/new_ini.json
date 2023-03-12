@@ -1,1 +1,1 @@
-{"Listnames": {}, "BSP Params": {"pcmlawselect": ["int", "pcmlawselect"]}}
+{"Listnames": {}, "SYSTEM Params": {"enableparametersmonitoring": ["int", "enableparametersmonitoring"], "activitylisttolog": ["int", "activitylisttolog"]}}

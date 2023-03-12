@@ -18,7 +18,7 @@
       </label><br>
       
       {% for label, value in section_options.items() %}   
-        <label>
+        <label style="font-weight:300;">
           <input type="checkbox" name="{{ section }}#{{ label }}" value="{{ value }}" class="{{ section }}-option">
           {{ label }}
         </label><br>
@@ -26,9 +26,12 @@
     {% endfor %}
     <br>
     <br>
+    
+    <h4>Tables</h4>
+
     {% for name in List_names%}
       <label style="font-weight:300;">
-        <input type="checkbox" name="{{ name }}#{{ name }}" value="{{ name }}" class="lists">
+        <input type="checkbox" name="{{ name }}#{{ name }}" value="{{ name }}" class="list">
         {{ name }}
       </label><br>
       {% endfor %}

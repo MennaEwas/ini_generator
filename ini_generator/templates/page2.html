@@ -12,13 +12,14 @@
       <div class="d-flex align-items-center">
     <form method="post">
       {% for key, values in key_dict.items() %}
+      <br>
         <h4>{{ key }}</h4>
         
           {% for value in values %}
           {% if value != "section" %}
-            {{ value }} 
-              <select class="form-select" name="{{ key }}#{{ value }}">
-                <option value="int">int</option>
+            <label  style="font-weight:300;" >{{ value }}</label>
+              <select style = "font-weight:300;" class="form-select" name="{{ key }}#{{ value }}">
+                <option value="int" >int</option>
                 <option value="str">str</option>
               </select>
             
@@ -27,11 +28,12 @@
         
       {% endfor %}
       {% if List_names %}
-      <h4>Lists</h4>
+      <br>
+      <h4>Tables</h4>
       {% endif %}
       {% for name in List_names %}
-            {{ name }} 
-              <select class="form-select" name="{{name}}">
+            <label style = "font-weight:300;">{{name}}</label>
+              <select style = "font-weight:300;" class="form-select"  name="{{name}}">
                 <option value="Table">Table</option>
               </select>
             

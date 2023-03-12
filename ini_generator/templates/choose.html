@@ -12,15 +12,18 @@
 	<div class="container my-5 allitem w-50">
 		<div class="d-flex align-items-center">
 		<form method="POST">
+			<br>
 			<h4> Enter Friendly Name </h4>
 				 {% for name in value_dict %}
 				 <div class="">
-					<label>{{ name }}</label>
+					<label  style="font-weight:300;" >{{ name }}</label>
 					<input class="form-control" placeholder="Friendly Name" type="text" name={{name}}>
 
 				 </div>
 				 {% endfor %}
-
+				 <br>
+</div>
+				<p style="font-weight:300;" > ** Note: If you didn't put any alternative Friendly Names the current name will be considered the Friendly Name</p>
 				 <input class="form-control btn btn-success  my-2" type="submit" value="Submit" name="action">
 		</form>
 	</div>

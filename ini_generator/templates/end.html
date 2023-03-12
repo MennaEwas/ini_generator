@@ -12,11 +12,24 @@
 			align-items: center;
 			height: 100vh;
 		}
+		.text-white {
+        animation: move 4s infinite alternate;
+    }
+    
+    @keyframes move {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(0%);
+        }
+    }
+		
 	</style>
 </head>
 <body class ="body">
 	<div class="center">
-		<h1 class = "text-white">Happy ending!</h1>
+		<h1 class = "text-white">Saved Successfully!</h1>
 	</div>
 </body>
 </html>
