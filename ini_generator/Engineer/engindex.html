@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JSON to HTML Example</title>
+  <style>
+    #main {
+      background-color: #ff7b00;
+      display: flex;
+    }
+    #form-wrapper {
+      background-color: antiquewhite;
+      font-weight: 300;
+      margin: auto;
+      margin-left: 50%;
+      margin-top: 30px;
+      margin-bottom: 30px;
+      padding-right: 450px;
+      padding-top: 10px;
+      padding-left: 30px;
+      padding-bottom: 30px;
+      width: 100%;
+    }
+    h1 {
+      font-weight: 100;
+    }
+  </style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles2.css') }}">
+</head>
+<body>
+  <div id="main">
+    <div>
+      <div id="form-wrapper">
+        <div id="output"></div>
+        <div class="d-flex align-items-center">
+          <button id="download-btn" class="btn btn-primary">Download</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const xhr = new XMLHttpRequest();
+const output = document.getElementById('output');
+
+// Set the callback function for when the file is loaded
+xhr.onload = function() {
+  // Parse JSON data
+  const data = JSON.parse(xhr.responseText);
+  for (const key in data) {
+    const mainObj = data[key];
+    const mainObjElement = document.createElement('div');
+    mainObjElement.innerHTML = `<h1>${key}</h1>`;
+    for (const subkey in mainObj) {
+      const subObj = mainObj[subkey];
+      const subObjElement = document.createElement('div');
+      const propertyElement = document.createElement('div');
+      propertyElement.innerHTML = `<label>${subObj[1]}</label> <input type="text" class="d-flex align-items-center" id="lname" name="${subkey}"> <br><br>`;
+      subObjElement.appendChild(propertyElement);
+      mainObjElement.appendChild(subObjElement);
+    }
+    output.appendChild(mainObjElement);
+  }
+
+  // Add click event listener to download button
+  const downloadBtn = document.getElementById('download-btn');
+  downloadBtn.addEventListener('click', function() {
+    let content = "";
+    const sections = output.querySelectorAll('h1');
+    for (let i = 0; i < sections.length; i++) {
+      const sectionName = sections[i].innerText;
+      content += `[${sectionName}]\n`;
+      const properties = sections[i].nextElementSibling.querySelectorAll('div');
+      for (let j = 0; j < properties.length; j++) {
+        const propertyName = properties[j].querySelector('label').innerText;
+        const propertyValue = properties[j].querySelector('input').value;
+        content += `${propertyName} = ${propertyValue};\n`;
+      }
+      content += "\n";
+    }
+    const file = new Blob([content], { type: 'application/octet-stream' });
+    const a = document.createElement('a');
+    a.download = 'output.ini';
+    a.href = URL.createObjectURL(file);
+    a.click();
+  });
+}
+
+xhr.open('GET','new_ini.json', true);
+xhr.send();
+
+    </script>
+  </div>
+</body>
+</html>

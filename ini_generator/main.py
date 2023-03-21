@@ -56,7 +56,7 @@ def index():
 def page2():
     key_dict = glo_dict[0]
     List_names = glo_dict[1]
-    print(key_dict)
+    #print(key_dict)
     value_dict = []
     for val in key_dict.values():
         value_dict += val
@@ -105,7 +105,7 @@ def end():
     names_types = glo_dict[2] #[['SYSTEM Params#ldapserviceenable', 'int'], ['SYSTEM Params#ldapauthfilter', 'int']]
     #print(names_types)
     names_new = glo_dict[4] #{'ldapserviceenable': 'df', 'ldapauthfilter': 'dfdf'}
-    sections = {'Listnames':{}} #{'SYSTEM Params': {'ldapauthfilter': [], 'syslogserverip': [], 'enablesyslog': []}}
+    sections = {'Tablenames':{}} #{'SYSTEM Params': {'ldapauthfilter': [], 'syslogserverip': [], 'enablesyslog': []}}
     
 
     for k, vl in selected.items():
@@ -115,7 +115,7 @@ def end():
             sections[k][v] = []
     
     for name in List_names:
-        sections['Listnames'][name] = []
+        sections['Tablenames'][name] = []
     
     for i in range(len(names_types)-len(List_names)):
         sc, it = names_types[i][0].split('#')
@@ -125,17 +125,17 @@ def end():
         j = i 
     if List_names and selected:     
         for i in range(len(List_names)):
-            sections['Listnames'][List_names[i]].append(names_types[j+i+1][1])
-            sections['Listnames'][List_names[i]].append(names_new[List_names[i].strip()])
+            sections['Tablenames'][List_names[i]].append(names_types[j+i+1][1])
+            sections['Tablenames'][List_names[i]].append(names_new[List_names[i].strip()])
     elif List_names:
         for i in range(len(List_names)):
-            sections['Listnames'][List_names[i]].append(names_types[i][1])
-            sections['Listnames'][List_names[i]].append(names_new[List_names[i].strip()])
+            sections['Tablenames'][List_names[i]].append(names_types[i][1])
+            sections['Tablenames'][List_names[i]].append(names_new[List_names[i].strip()])
     
 
     
-
-    with open("new_ini.json", "w") as outfile:
+#Engineer\new_ini.json
+    with open("Engineer//new_ini.json", "w") as outfile:
         json.dump(sections, outfile)
 
 

@@ -1,0 +1,21 @@
+/* Style the checked option checkboxes */
+/* Add spacing between input checkboxes */
+input[type="checkbox"] {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  
+  
+  input[class="section-checkbox"] {
+    margin-top: 30px;
+  }
+  
+  .body {
+    /* background-color:rgb(231, 86, 34); */
+    background-color: #ff7b00;
+  }
+  
+  .allitem {
+   background-color: antiquewhite;
+    /* background-color: rgba(255, 166, 0, 0.209); */
+  }
