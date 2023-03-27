@@ -6,6 +6,7 @@ import json
 app = Flask(__name__, static_url_path='/static')
 bootstrap = Bootstrap(app)
 glo_dict = []
+options = {}
 # glo_dict 0:key_dict, 1: Lists, 2: Values, 3: Names
 # change this if u want
 
@@ -15,7 +16,6 @@ def index():
     keys_dict = {}
     config = ConfigParser()
     config.read('file.ini')
-    options = {}
     List_names = []  # saves the name of lists which is also with the type list by default
     ListChosenNames = []
     for section in config.sections():
@@ -25,6 +25,7 @@ def index():
         options[section] = {}
         for key, value in config.items(section):
             options[section][key] = value
+    
     if request.method == 'POST':
         f = request.form
         for key in f.keys():
@@ -80,7 +81,9 @@ def page2():
 @app.route('/choose', methods=['GET', 'POST'])
 def choose():
     names = glo_dict[2]  # use endswith for names[i][0] to map it with glo_dict
+    
     value_dict = glo_dict[3]
+    
     # It doesn't have action in the post request
     if request.method == 'POST':
         f = request.form
@@ -134,7 +137,7 @@ def end():
     
 
     
-#Engineer\new_ini.json
+#Engineer\new_ini.json: http://127.0.0.1:8000/Engineer/engindex.html
     with open("Engineer//new_ini.json", "w") as outfile:
         json.dump(sections, outfile)
 

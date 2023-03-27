@@ -53,11 +53,11 @@ xhr.onload = function() {
     mainObjElement.innerHTML = `<h1>${key}</h1>`;
     for (const subkey in mainObj) {
       const subObj = mainObj[subkey];
-      const subObjElement = document.createElement('div');
+      // const subObjElement = document.createElement('div');
       const propertyElement = document.createElement('div');
       propertyElement.innerHTML = `<label>${subObj[1]}</label> <input type="text" class="d-flex align-items-center" id="lname" name="${subkey}"> <br><br>`;
-      subObjElement.appendChild(propertyElement);
-      mainObjElement.appendChild(subObjElement);
+      // subObjElement.appendChild(propertyElement);
+      mainObjElement.appendChild(propertyElement);
     }
     output.appendChild(mainObjElement);
   }
@@ -70,7 +70,8 @@ xhr.onload = function() {
     for (let i = 0; i < sections.length; i++) {
       const sectionName = sections[i].innerText;
       content += `[${sectionName}]\n`;
-      const properties = sections[i].nextElementSibling.querySelectorAll('div');
+      
+      const properties = sections[i].parentElement.querySelectorAll('div');
       for (let j = 0; j < properties.length; j++) {
         const propertyName = properties[j].querySelector('label').innerText;
         const propertyValue = properties[j].querySelector('input').value;
