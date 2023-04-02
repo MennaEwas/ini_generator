@@ -9,6 +9,7 @@
 </head>
 
 <body class="body">
+	<h1>Admin</h1>
 	<div class="container my-5 allitem w-50">
 		<div class="d-flex align-items-center">
 		<form method="POST">
@@ -19,12 +20,12 @@
 				{% set name = myname.split('#') %}
 				<div class="">
 					<label style="font-weight: 300;">{{ name[0] }} / {{ name[1] }}</label>
-					<input class="form-control" placeholder={{name[1]}} type="text" name={{name[1]}}>
+					<input class="form-control" value={{name[1]}} type="text" name={{name[1]}}>
 				</div>
 			{% else %}
 				<div class="">
 					<label style="font-weight: 300;">Tables / {{ myname }}</label>
-					<input class="form-control" placeholder={{myname}} type="text" name={{myname}}>
+					<input class="form-control" value={{myname}} type="text" name={{myname}}>
 				</div>
 			{% endif %}
 		{% endfor %}
