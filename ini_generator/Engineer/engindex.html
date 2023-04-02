@@ -52,7 +52,7 @@ xhr.onload = function() {
       const subObj = mainObj[subkey];
       // const subObjElement = document.createElement('div');
       const propertyElement = document.createElement('div');
-      propertyElement.innerHTML = `<label class = "${subkey}">${subObj[1]}</label> <input type="text" value = "${subObj[2]}" class="d-flex align-items-center" id="lname" name="${subkey}"> <br><br>`;
+      propertyElement.innerHTML = `<label class = "${subkey}"> Enter ${subObj[1]}</label> <input type="text" value = "${subObj[2]}" class="d-flex align-items-center" id="lname" name="${subkey}"> <br><br>`;
 
       // subObjElement.appendChild(propertyElement);
       mainObjElement.appendChild(propertyElement);
