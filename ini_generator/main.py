@@ -6,11 +6,11 @@ import json
 app = Flask(__name__, static_url_path='/static')
 bootstrap = Bootstrap(app)
 glo_dict = []
-options = {}
+options = {} #values of every values (old one)
+dict_names = {} #tables values 
+
 # glo_dict 0:key_dict, 1: Lists, 2: Values, 3: Names
 # change this if u want
-
-
 @app.route("/", methods=['GET', 'POST'])
 def index():
     keys_dict = {}
@@ -20,12 +20,14 @@ def index():
     ListChosenNames = []
     for section in config.sections():
         if section.startswith(" \\"):  # good
-            List_names.append(options.popitem()[0])
+            k = options.popitem()
+            List_names.append(k[0])
+            dict_names[k[0]] = k[1]
             continue
         options[section] = {}
         for key, value in config.items(section):
             options[section][key] = value
-    
+
     if request.method == 'POST':
         f = request.form
         for key in f.keys():
@@ -36,15 +38,15 @@ def index():
                     continue
                 if s in List_names:
                     ListChosenNames.append(s)
-
                 else:
                     if s not in keys_dict:
                         keys_dict[s] = []
                     keys_dict[s].append(x)
+        
 
         glo_dict.append(keys_dict)
-        
         glo_dict.append(ListChosenNames)
+        
         if request.form.get('action') == 'Submit':
             return redirect(url_for('page2'))
 
@@ -119,23 +121,26 @@ def end():
     
     for name in List_names:
         sections['Tablenames'][name] = []
-    
+    #for sections 
     for i in range(len(names_types)-len(List_names)):
         sc, it = names_types[i][0].split('#')
         if sc in sections:
             sections[sc][it].append(names_types[i][1])
             sections[sc][it].append(names_new[it])
+            sections[sc][it].append(options[sc][it])
+
         j = i 
     if List_names and selected:     
         for i in range(len(List_names)):
             sections['Tablenames'][List_names[i]].append(names_types[j+i+1][1])
             sections['Tablenames'][List_names[i]].append(names_new[List_names[i].strip()])
+            sections['Tablenames'][List_names[i]].append(str(dict_names[List_names[i]]))
+
     elif List_names:
         for i in range(len(List_names)):
             sections['Tablenames'][List_names[i]].append(names_types[i][1])
             sections['Tablenames'][List_names[i]].append(names_new[List_names[i].strip()])
-    
-
+            sections['Tablenames'][List_names[i]].append(str(dict_names[List_names[i]]))
     
 #Engineer\new_ini.json: http://127.0.0.1:8000/Engineer/engindex.html
     with open("Engineer//new_ini.json", "w") as outfile:
@@ -146,4 +151,4 @@ def end():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port = 5001)
