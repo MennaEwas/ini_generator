@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Checkbox Group</title>
+</head>
+<body>
+	<form method = "post" >
+		<h3>Dictionary Items:</h3>
+		{% for key, value in key_dict.items() %}
+			{% for item in value %}
+				<input type="checkbox" name="section#{{ key }}" value="{{ item }}"> {{ item }}<br>
+			{% endfor %}
+		{% endfor %}
+		
+		<h3>List Items:</h3>
+		{% for item in List_names %}
+			<input type="checkbox" name="list#{{ item }}" value="{{ item }}"> {{ item }}<br>
+		{% endfor %}
+		
+		<h3>Create Group:</h3>
+		<label for="group-name">Group Name:</label>
+		<input type="text" id="group-name" name="group-name"><br>
+		<button type="button" onclick="createGroup()">Group</button>
+        <input class="form-control btn btn-success  my-2" type="submit" value="Submit" name="action">
+	</form>
+	
+	<script>
+		function createGroup() {
+        var groupName = document.getElementById("group-name").value;
+        var items = document.getElementsByTagName("input");
+        var selectedItems = [];
+
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].checked) {
+                selectedItems.push(items[i].value);
+            }
+        }
+        console.log(selectedItems)
+        var groups = document.getElementsByName("group[]");
+        var groupExists = false;
+
+        for (var i = 0; i < groups.length; i++) {
+            if (groups[i].value == groupName) {
+                groupExists = true;
+                break;
+            }
+        }
+    //now I want to make a group and this group came back in the form
+    return selectedItems;
+}
+
+	</script>
+</body>
+</html>
