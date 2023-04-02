@@ -1,16 +1,19 @@
 from flask import Flask, render_template, url_for, request, redirect
 from configparser import ConfigParser
 from flask_bootstrap import Bootstrap
-import json 
+import json
 
 app = Flask(__name__, static_url_path='/static')
 bootstrap = Bootstrap(app)
 glo_dict = []
-options = {} #values of every values (old one)
-dict_names = {} #tables values 
+options = {}  # values of every values (old one)
+dict_names = {}  # tables values
+groups = {}  # List of groups with friendly new name as a key --> then make everything goes with it
 
 # glo_dict 0:key_dict, 1: Lists, 2: Values, 3: Names
 # change this if u want
+
+
 @app.route("/", methods=['GET', 'POST'])
 def index():
     keys_dict = {}
@@ -42,24 +45,47 @@ def index():
                     if s not in keys_dict:
                         keys_dict[s] = []
                     keys_dict[s].append(x)
+        '''
+        print(keys_dict)
+        {'SYSTEM Params': ['ldapserviceenable', 'ldapauthfilter',
+            'syslogserverip'], 'Voice Engine Params': ['sbcdevicerole']}
+        '''
         
-
         glo_dict.append(keys_dict)
         glo_dict.append(ListChosenNames)
-        
+
         if request.form.get('action') == 'Submit':
-            return redirect(url_for('page2'))
+            return redirect(url_for('group'))
 
     html = render_template('index.html', options=options,
                            List_names=List_names)
     return html
+
+# in this page the admin groups some items to be changed
+
+
+@app.route('/group', methods=['GET', 'POST'])
+def group():
+    key_dict = glo_dict[0]
+    List_names = glo_dict[1]
+
+
+    ''' kol el 7agat elly hay5tarha as list of choices and he could choose from it,
+    don't include one in different groups for sure'''
+
+    if request.method == 'POST':
+        f = request.form
+        print(f)
+        if request.form.get('action') == 'Submit':
+            return redirect(url_for('page2'))
+    return render_template('group.html', key_dict=key_dict, List_names=List_names)
 
 
 @app.route('/page2', methods=['GET', 'POST'])
 def page2():
     key_dict = glo_dict[0]
     List_names = glo_dict[1]
-    #print(key_dict)
+    # print(key_dict)
     value_dict = []
     for val in key_dict.values():
         value_dict += val
@@ -83,9 +109,9 @@ def page2():
 @app.route('/choose', methods=['GET', 'POST'])
 def choose():
     names = glo_dict[2]  # use endswith for names[i][0] to map it with glo_dict
-    
+
     value_dict = glo_dict[3]
-    
+
     # It doesn't have action in the post request
     if request.method == 'POST':
         f = request.form
@@ -94,8 +120,7 @@ def choose():
         for k, v in lookup_names.items():
             if v == '':
                 lookup_names[k] = k
-        glo_dict.append(lookup_names) 
-
+        glo_dict.append(lookup_names)
 
         if f.get('action') == 'Submit':
             return redirect(url_for('end'))
@@ -106,22 +131,21 @@ def choose():
 @app.route('/end', methods=['GET', 'POST'])
 def end():
     selected = glo_dict[0]
-    List_names = glo_dict[1] #Chosen List names 
-    names_types = glo_dict[2] #[['SYSTEM Params#ldapserviceenable', 'int'], ['SYSTEM Params#ldapauthfilter', 'int']]
-    #print(names_types)
-    names_new = glo_dict[4] #{'ldapserviceenable': 'df', 'ldapauthfilter': 'dfdf'}
-    sections = {'Tablenames':{}} #{'SYSTEM Params': {'ldapauthfilter': [], 'syslogserverip': [], 'enablesyslog': []}}
-    
+    List_names = glo_dict[1]  # Chosen List names 
+    names_types = glo_dict[2]  # [['SYSTEM Params#ldapserviceenable', 'int'], ['SYSTEM Params#ldapauthfilter', 'int']]
+    # print(names_types)
+    names_new = glo_dict[4]  # {'ldapserviceenable': 'df', 'ldapauthfilter': 'dfdf'}
+    sections = {'Tablenames': {}} #{'SYSTEM Params': {'ldapauthfilter': [], 'syslogserverip': [], 'enablesyslog': []}}
 
     for k, vl in selected.items():
         if k not in sections:
             sections[k] = {}
-        for v in vl: 
+        for v in vl:
             sections[k][v] = []
-    
+
     for name in List_names:
         sections['Tablenames'][name] = []
-    #for sections 
+    #for sections
     for i in range(len(names_types)-len(List_names)):
         sc, it = names_types[i][0].split('#')
         if sc in sections:
@@ -129,26 +153,29 @@ def end():
             sections[sc][it].append(names_new[it])
             sections[sc][it].append(options[sc][it])
 
-        j = i 
-    if List_names and selected:     
+        j = i
+    if List_names and selected:
         for i in range(len(List_names)):
             sections['Tablenames'][List_names[i]].append(names_types[j+i+1][1])
-            sections['Tablenames'][List_names[i]].append(names_new[List_names[i].strip()])
-            sections['Tablenames'][List_names[i]].append(str(dict_names[List_names[i]]))
+            sections['Tablenames'][List_names[i]].append(
+                names_new[List_names[i].strip()])
+            sections['Tablenames'][List_names[i]].append(
+                str(dict_names[List_names[i]]))
 
     elif List_names:
         for i in range(len(List_names)):
             sections['Tablenames'][List_names[i]].append(names_types[i][1])
-            sections['Tablenames'][List_names[i]].append(names_new[List_names[i].strip()])
-            sections['Tablenames'][List_names[i]].append(str(dict_names[List_names[i]]))
-    
-#Engineer\new_ini.json: http://127.0.0.1:8000/Engineer/engindex.html
+            sections['Tablenames'][List_names[i]].append(
+                names_new[List_names[i].strip()])
+            sections['Tablenames'][List_names[i]].append(
+                str(dict_names[List_names[i]]))
+
+# Engineer\new_ini.json: http://127.0.0.1:8000/Engineer/engindex.html
     with open("Engineer//new_ini.json", "w") as outfile:
         json.dump(sections, outfile)
-
 
     return render_template('end.html')
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port = 5001)
+    app.run(debug=True, port= 5001)
