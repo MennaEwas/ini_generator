@@ -5,8 +5,9 @@ import json
 
 app = Flask(__name__, static_url_path='/static')
 bootstrap = Bootstrap(app)
+
 glo_dict = []
-options = {}  # values of every values (old one)
+options = {}  # values of every values (old one) / free of choices without lists
 dict_names = {}  # tables values
 groups = {}  # List of groups with friendly new name as a key --> then make everything goes with it
 
@@ -50,9 +51,12 @@ def index():
         {'SYSTEM Params': ['ldapserviceenable', 'ldapauthfilter',
             'syslogserverip'], 'Voice Engine Params': ['sbcdevicerole']}
         '''
-        
-        glo_dict.append(keys_dict)
+        if keys_dict: 
+            glo_dict.append(keys_dict)
+        else: 
+            glo_dict.append([])
         glo_dict.append(ListChosenNames)
+        #print(dict_names)
 
         if request.form.get('action') == 'Submit':
             return redirect(url_for('group'))
@@ -67,18 +71,38 @@ def index():
 @app.route('/group', methods=['GET', 'POST'])
 def group():
     key_dict = glo_dict[0]
-    List_names = glo_dict[1]
+    List_names = glo_dict[1] #list of names 
 
+    ''' {'g2': ['SYSTEM Params/syslogserverip', 'WEB Params/logowidth'],
+      'g1': ['SYSTEM Params/ldapauthfilter', 'BSP Params/exitcpuoverloadpercent']}'''
+    table_values = {} #Listchoice : {format index: rows, col0: --, col1: -- , --->}
+    row_col = {}
+    for list_name in List_names:#elchoices
+        if list_name in dict_names: #kol options
+            table_values[list_name] = dict_names[list_name] 
+            
+    #print(table_values)
+    for k, v in table_values.items():
+        if k not in row_col:
+            row_col[k] = {}
+        row = list(table_values[k]['format index'].strip(';').split(', '))
+        col = list(table_values.keys())[1:]
+        row_col[k]['row'] = row
+        row_col[k]['col'] = col
 
-    ''' kol el 7agat elly hay5tarha as list of choices and he could choose from it,
-    don't include one in different groups for sure'''
-
+    #print(row_col)
+            
     if request.method == 'POST':
-        f = request.form
-        print(f)
+        group_items = request.form.getlist('group')
+
+        for group in group_items:
+            name, items = group.split(':')
+            groups[name] = items.split(',')
+        #print(groups)
+
         if request.form.get('action') == 'Submit':
             return redirect(url_for('page2'))
-    return render_template('group.html', key_dict=key_dict, List_names=List_names)
+    return render_template('group.html', key_dict=key_dict, List_names=List_names, row_col=row_col)
 
 
 @app.route('/page2', methods=['GET', 'POST'])
@@ -87,9 +111,13 @@ def page2():
     List_names = glo_dict[1]
     # print(key_dict)
     value_dict = []
-    for val in key_dict.values():
-        value_dict += val
-    value_dict += List_names
+    if key_dict:
+        for val in key_dict.values():
+            value_dict += val
+        value_dict += List_names
+    else:
+        value_dict = List_names
+
 
     names = []
     if request.method == 'POST':
@@ -131,11 +159,14 @@ def choose():
 @app.route('/end', methods=['GET', 'POST'])
 def end():
     selected = glo_dict[0]
-    List_names = glo_dict[1]  # Chosen List names 
-    names_types = glo_dict[2]  # [['SYSTEM Params#ldapserviceenable', 'int'], ['SYSTEM Params#ldapauthfilter', 'int']]
+    List_names = glo_dict[1]  # Chosen List names
+    # [['SYSTEM Params#ldapserviceenable', 'int'], ['SYSTEM Params#ldapauthfilter', 'int']]
+    names_types = glo_dict[2]
     # print(names_types)
-    names_new = glo_dict[4]  # {'ldapserviceenable': 'df', 'ldapauthfilter': 'dfdf'}
-    sections = {'Tablenames': {}} #{'SYSTEM Params': {'ldapauthfilter': [], 'syslogserverip': [], 'enablesyslog': []}}
+    # {'ldapserviceenable': 'df', 'ldapauthfilter': 'dfdf'}
+    names_new = glo_dict[4]
+    # {'SYSTEM Params': {'ldapauthfilter': [], 'syslogserverip': [], 'enablesyslog': []}}
+    sections = {'Tablenames': {}}
 
     for k, vl in selected.items():
         if k not in sections:
@@ -145,7 +176,7 @@ def end():
 
     for name in List_names:
         sections['Tablenames'][name] = []
-    #for sections
+    # for sections
     for i in range(len(names_types)-len(List_names)):
         sc, it = names_types[i][0].split('#')
         if sc in sections:
@@ -178,4 +209,4 @@ def end():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port= 5001)
+    app.run(debug=True, port=5001)
