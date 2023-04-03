@@ -1,54 +1,116 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<title>Checkbox Group</title>
+    <title>Checkbox Group</title>
 </head>
+
 <body>
-	<form method = "post" >
-		<h3>Dictionary Items:</h3>
-		{% for key, value in key_dict.items() %}
-			{% for item in value %}
-				<input type="checkbox" name="section#{{ key }}" value="{{ item }}"> {{ item }}<br>
-			{% endfor %}
-		{% endfor %}
-		
-		<h3>List Items:</h3>
-		{% for item in List_names %}
-			<input type="checkbox" name="list#{{ item }}" value="{{ item }}"> {{ item }}<br>
-		{% endfor %}
-		
-		<h3>Create Group:</h3>
-		<label for="group-name">Group Name:</label>
-		<input type="text" id="group-name" name="group-name"><br>
-		<button type="button" onclick="createGroup()">Group</button>
+    <form method="post">
+        {% if key_dict %}
+        <h3>Sections:</h3>
+        {% for key, value in key_dict.items() %}
+        <h4> {{ key }} </h4>
+        {% for item in value %}
+        <input type="checkbox" name="section#{{ key }}" value="{{ key }}/{{ item }}"> {{ item }}<br>
+        {% endfor %}
+        {% endfor %}
+        {% endif %}
+
+        {% if List_names %}
+        <h3>Tables:</h3>
+        {% for item in List_names %}
+
+        <input type="checkbox" name="list#{{ item }}" value="{{ item }}"> {{ item }}<br>
+        {% if item in row_col %}
+        <select name="row" id="row">
+            <option>row</option>
+            {% for row_item in row_col[item]['row'] %}
+            <option value="{{ row_item }}">{{ row_item }}</option>
+            {% endfor %}
+        </select>
+        <select name="col" id="col">
+            <option>col</option>
+            {% for col_item in row_col[item]['col'] %}
+
+            <option value="{{ col_item }}">{{col_item}}</option>
+            {% endfor %}
+        </select>
+
+        
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <h3>Create Group:</h3>
+        <label for="group-name">Group Name:</label>
+        <input type="text" id="group-name" name="group-name"><br>
+        <button type="button" onclick="createGroup()">Group</button>
         <input class="form-control btn btn-success  my-2" type="submit" value="Submit" name="action">
-	</form>
-	
-	<script>
-		function createGroup() {
-        var groupName = document.getElementById("group-name").value;
-        var items = document.getElementsByTagName("input");
-        var selectedItems = [];
+        <div id="groups-container"></div>
 
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].checked) {
-                selectedItems.push(items[i].value);
+    </form>
+
+    <script>
+        function createGroup() {
+            var groupName = document.getElementById("group-name").value;
+            var items = document.getElementsByTagName("input");
+            var selectedItems = [];
+
+
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].checked) {
+                    selectedItems.push(items[i].value);
+                }
+            }
+
+            var groupsContainer = document.getElementById("groups-container");
+            var groups = document.getElementsByName("group[]");
+            var groupExists = false;
+
+            for (var i = 0; i < groups.length; i++) {
+                if (groups[i].value == groupName) {
+                    groupExists = true;
+                    break;
+                }
+            }
+
+            if (!groupExists) {
+                var groupDiv = document.createElement("div");
+                groupDiv.classList.add("group");
+
+                var header = document.createElement("h2");
+                header.textContent = groupName;
+                groupDiv.appendChild(header);
+
+                var list = document.createElement("ul");
+
+                for (var i = 0; i < selectedItems.length; i++) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = selectedItems[i];
+                    list.appendChild(listItem);
+                }
+
+                groupDiv.appendChild(list);
+                groupsContainer.appendChild(groupDiv);
+                // Add hidden input field for group name and items
+                var groupItems = groupName + ':' + selectedItems.join(',');
+                var groupInput = document.createElement("input");
+                groupInput.type = "hidden";
+                groupInput.name = "group";
+                groupInput.value = groupItems;
+                document.querySelector("form").appendChild(groupInput);
+            }
+
+            // Clear input values
+            document.getElementById("group-name").value = "";
+            for (var i = 0; i < items.length; i++) {
+                items[i].checked = false;
             }
         }
-        console.log(selectedItems)
-        var groups = document.getElementsByName("group[]");
-        var groupExists = false;
 
-        for (var i = 0; i < groups.length; i++) {
-            if (groups[i].value == groupName) {
-                groupExists = true;
-                break;
-            }
-        }
-    //now I want to make a group and this group came back in the form
-    return selectedItems;
-}
 
-	</script>
+    </script>
 </body>
+
 </html>
