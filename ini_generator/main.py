@@ -86,7 +86,7 @@ def group():
         if k not in row_col:
             row_col[k] = {}
         row = list(table_values[k]['format index'].strip(';').split(', '))
-        col = list(table_values.keys())[1:]
+        col = list(table_values[k].keys())[1:]
         row_col[k]['row'] = row
         row_col[k]['col'] = col
 
