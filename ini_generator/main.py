@@ -6,11 +6,13 @@ import json
 app = Flask(__name__, static_url_path='/static')
 bootstrap = Bootstrap(app)
 
+row_col = {}
 glo_dict = []
-options = {}  # values of every values (old one) / free of choices without lists
+# values of every values (old one) / free of choices without lists
+options = {}
 dict_names = {}  # tables values
-groups = {}  # List of groups with friendly new name as a key --> then make everything goes with it
-
+# List of groups with friendly new name {'g2': ['SYSTEM Params/enableparametersmonitoring', ' IpProfile ']}
+groups = {}
 # glo_dict 0:key_dict, 1: Lists, 2: Values, 3: Names
 # change this if u want
 
@@ -51,12 +53,12 @@ def index():
         {'SYSTEM Params': ['ldapserviceenable', 'ldapauthfilter',
             'syslogserverip'], 'Voice Engine Params': ['sbcdevicerole']}
         '''
-        if keys_dict: 
+        if keys_dict:
             glo_dict.append(keys_dict)
-        else: 
+        else:
             glo_dict.append([])
         glo_dict.append(ListChosenNames)
-        #print(dict_names)
+        # print(dict_names)
 
         if request.form.get('action') == 'Submit':
             return redirect(url_for('group'))
@@ -65,23 +67,21 @@ def index():
                            List_names=List_names)
     return html
 
-# in this page the admin groups some items to be changed
 
-
+# added new
 @app.route('/group', methods=['GET', 'POST'])
 def group():
     key_dict = glo_dict[0]
-    List_names = glo_dict[1] #list of names 
+    List_names = glo_dict[1]  # list of names of the tables
 
     ''' {'g2': ['SYSTEM Params/syslogserverip', 'WEB Params/logowidth'],
       'g1': ['SYSTEM Params/ldapauthfilter', 'BSP Params/exitcpuoverloadpercent']}'''
-    table_values = {} #Listchoice : {format index: rows, col0: --, col1: -- , --->}
-    row_col = {}
-    for list_name in List_names:#elchoices
-        if list_name in dict_names: #kol options
-            table_values[list_name] = dict_names[list_name] 
-            
-    #print(table_values)
+    table_values = {}  # Listchoice : {format index: rows, col0: --, col1: -- , --->}
+
+    for list_name in List_names:  # elchoices
+        if list_name in dict_names:  # kol options
+            table_values[list_name] = dict_names[list_name]
+
     for k, v in table_values.items():
         if k not in row_col:
             row_col[k] = {}
@@ -90,16 +90,15 @@ def group():
         row_col[k]['row'] = row
         row_col[k]['col'] = col
 
-    #print(row_col)
-            
     if request.method == 'POST':
         group_items = request.form.getlist('group')
+        # print(group_items)
 
         for group in group_items:
             name, items = group.split(':')
             groups[name] = items.split(',')
-        #print(groups)
 
+        # print('groups: ', groups)
         if request.form.get('action') == 'Submit':
             return redirect(url_for('page2'))
     return render_template('group.html', key_dict=key_dict, List_names=List_names, row_col=row_col)
@@ -108,36 +107,46 @@ def group():
 @app.route('/page2', methods=['GET', 'POST'])
 def page2():
     key_dict = glo_dict[0]
+    shown_key_dict = glo_dict[0]
+    # print('key_dict', key_dict)
+    # Modify the shown_key_dict
+    for gb in groups.values():
+        for g in gb:
+            if len(g.split("/")) == 2:
+                section_name, section_item_name = g.split("/")
+                if section_name in shown_key_dict:
+                    if section_item_name in shown_key_dict[section_name]:
+                        shown_key_dict[section_name].remove(section_item_name)
+
+    # print('shown' ,shown_key_dict)
+
     List_names = glo_dict[1]
-    # print(key_dict)
     value_dict = []
-    if key_dict:
-        for val in key_dict.values():
+    if shown_key_dict:
+        for val in shown_key_dict.values():
             value_dict += val
         value_dict += List_names
     else:
         value_dict = List_names
-
-
     names = []
     if request.method == 'POST':
         f = request.form
         for item in f.items():
             if item[0] != 'action':
                 names.append([item[0], item[1]])
+
         glo_dict.append(names)
         glo_dict.append(value_dict)
         if request.form.get('action') == 'Submit':
             return redirect(url_for('choose'))
 
     # default return statement for GET requests
-    return render_template('page2.html', key_dict=key_dict, List_names=List_names)
+    return render_template('page2.html', key_dict=shown_key_dict, List_names=List_names, groups=groups)
 
 
 @app.route('/choose', methods=['GET', 'POST'])
 def choose():
     names = glo_dict[2]  # use endswith for names[i][0] to map it with glo_dict
-
     value_dict = glo_dict[3]
 
     # It doesn't have action in the post request
@@ -158,7 +167,21 @@ def choose():
 
 @app.route('/end', methods=['GET', 'POST'])
 def end():
+
+    #make a json file for groups collect all the groups with its Items 
+    with open("Engineer//groups.json", "w") as outfile:
+        json.dump(groups, outfile)
+
+    print(glo_dict)
     selected = glo_dict[0]
+    # Modify the shown_key_dict
+    for gb in groups.values():
+        for g in gb:
+            if len(g.split("/")) == 2:
+                section_name, section_item_name = g.split("/")
+                if section_name in selected:
+                    if section_item_name in selected[section_name]:
+                        selected[section_name].remove(section_item_name)
     List_names = glo_dict[1]  # Chosen List names
     # [['SYSTEM Params#ldapserviceenable', 'int'], ['SYSTEM Params#ldapauthfilter', 'int']]
     names_types = glo_dict[2]
@@ -166,7 +189,7 @@ def end():
     # {'ldapserviceenable': 'df', 'ldapauthfilter': 'dfdf'}
     names_new = glo_dict[4]
     # {'SYSTEM Params': {'ldapauthfilter': [], 'syslogserverip': [], 'enablesyslog': []}}
-    sections = {'Tablenames': {}}
+    sections = {'GROUPS': groups, 'Tablenames': {}}
 
     for k, vl in selected.items():
         if k not in sections:
@@ -177,17 +200,32 @@ def end():
     for name in List_names:
         sections['Tablenames'][name] = []
     # for sections
+    # print(groups)
+    # print("nt",names_types)
+    # print("nn",names_new)
+    # print("op",options)
     for i in range(len(names_types)-len(List_names)):
-        sc, it = names_types[i][0].split('#')
-        if sc in sections:
-            sections[sc][it].append(names_types[i][1])
-            sections[sc][it].append(names_new[it])
-            sections[sc][it].append(options[sc][it])
+        temp = names_types[i][0].split('#')
+        if len(temp) == 2:
+            sc, it = temp[0], temp[1]
+            if sc in sections:
+                # pass
+                sections[sc][it].append(names_types[i][1])
+                sections[sc][it].append(names_new[it])
+                sections[sc][it].append(options[sc][it])
+        pass_variable = i
+    #da el groups sa7?    
+    sections["Groups"] = {
+    }
+    for i, j in enumerate(groups.keys()):
+        sections["Groups"][j] = [
+            names_types[len(names_types) - len(groups) + i][1], names_new[j], "holder"]
+        
 
-        j = i
     if List_names and selected:
         for i in range(len(List_names)):
-            sections['Tablenames'][List_names[i]].append(names_types[j+i+1][1])
+            sections['Tablenames'][List_names[i]].append(
+                names_types[pass_variable+i+1][1])
             sections['Tablenames'][List_names[i]].append(
                 names_new[List_names[i].strip()])
             sections['Tablenames'][List_names[i]].append(
@@ -209,4 +247,4 @@ def end():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5002)
